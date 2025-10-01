@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sony S60 Home Theater Demo</title>
+
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&family=Cinzel:wght@700&display=swap" rel="stylesheet">
+
+<style>
+/* Hide scrollbars */
+body::-webkit-scrollbar { width: 0; height:0; }
+body { scrollbar-width: none; -ms-overflow-style: none; }
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  overflow-x: hidden;
+  background: #000;
+  font-family: 'Orbitron', sans-serif;
+  color: #fff;
+  scroll-behavior: smooth;
+}
+
+/* Curtains */
+.curtain {
+  position: fixed;
+  top: 0;
+  width: 50vw;
+  height: 100%;
+  background: linear-gradient(to bottom, #700000, #300000);
+  z-index: 999;
+}
+.curtain.left { left: 0; animation: openLeft 2s forwards ease-in-out; }
+.curtain.right { right: 0; animation: openRight 2s forwards ease-in-out; }
+
+@keyframes openLeft { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+@keyframes openRight { 0% { transform: translateX(0); } 100% { transform: translateX(100%); } }
+
+/* Content wrapper */
+.content {
+  opacity: 0;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: opacity 1s ease 2s;
+  padding-bottom: 80px;
+}
+.content.show { opacity: 1; }
+
+header {
+  padding: 4vw 2vw;
+  text-align: center;
+  color: #ff1e1e;
+}
+header h1 {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(2rem, 4vw, 5rem);
+  text-shadow: 0 0 1vw #ff0000, 0 0 2vw #ff4c4c;
+  margin-bottom: 1vh;
+  animation: marqueeTitle 5s linear infinite alternate;
+}
+p.tagline {
+  font-size: clamp(1rem,2vw,2.5rem);
+  color: #ffa8a8;
+  text-shadow: 0 0 0.2vw #ff1e1e, 0 0 0.5vw #ff4c4c;
+}
+
+@keyframes marqueeTitle {
+  0%, 100% { text-shadow: 0 0 1vw #ff0000, 0 0 2vw #ff4c4c; }
+  50% { text-shadow: 0 0 1.5vw #ffff00, 0 0 2.5vw #ff5555; }
+}
+
+/* Video Container for theater 2.35:1 ratio */
+.video-container {
+  position: relative;
+  width: 90%;
+  max-width: 1200px;
+  margin: 3vh auto;
+  /* 2.35:1 cinematic ratio: height = width / 2.35 */
+  padding-top: 42.55%;
+  border: 0.5vw solid #333;
+  border-radius: 1vw;
+  box-shadow: 
+    inset 0 0 1vw #000,
+    0 0 3vw rgba(255,30,30,0.6),   /* stronger red glow */
+    0 0 6vw rgba(255,30,30,0.4),
+    0 0 10vw rgba(255,30,30,0.2);
+  background: #000;
+}
+
+.video-container video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 1vw;
+  object-fit: cover;
+}
+
+/* Check Product Button */
+.btn-action {
+  display: none;
+  padding: 1vw 3vw;
+  background: #ff1e1e;
+  color: #fff;
+  border: none;
+  border-radius: 3vw;
+  font-size: 1.2vw;
+  cursor: pointer;
+  margin: 2vh 0;
+  transition: background 0.3s ease;
+}
+.btn-action:hover { background: #ff5c5c; }
+
+/* Product Gallery */
+.gallery {
+  display: none;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2vw;
+  width: 90%;
+  margin: 2vh auto;
+}
+.gallery img {
+  width: 100%;
+  border-radius: 1vw;
+  border: 0.3vw solid #ff1e1e;
+  box-shadow: 0 0 1vw #ff1e1e;
+  transition: transform 0.3s;
+}
+.gallery img:hover { transform: scale(1.05); }
+
+footer {
+  width: 100%;
+  padding: 1.5vh 1vw;
+  font-size: clamp(0.8rem, 2vw, 1.2rem);
+  background: rgba(0, 0, 0, 0.8);
+  color: #666;
+  text-align: center;
+}
+
+/* Floating Popcorn */
+.popcorn {
+  position: fixed;
+  width: 8vw;
+  max-width: 50px;
+  will-change: transform, opacity;
+  animation: floatPopcorn 6s infinite linear;
+  z-index: 6;
+}
+@keyframes floatPopcorn {
+  0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+  30% { opacity: 1; }
+  100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- Curtains -->
+<div class="curtain left"></div>
+<div class="curtain right"></div>
+
+<!-- Main Content -->
+<div class="content" id="mainContent">
+  <header>
+    <h1>🎬 BRAVIA Theatre System 6 HT-S60</h1>
+    <p class="tagline">Feel the bass. Hear the surround. Experience the theater at home.<br>5.1ch cinematic power—feel it move with Dolby Atmos</p>
+  </header>
+
+  <!-- Local Video -->
+  <div class="video-container">
+    <video id="demoVideo" controls autoplay>
+      <source src="fps.mp4" type="video/mp4"> <!-- #here you place your video -->
+      Your browser does not support the video tag.
+    </video>
+  </div>
+
+  <!-- Check Product Button -->
+  <button class="btn-action" id="productBtn" onclick="document.querySelector('.gallery').style.display='grid'">
+    🔎 Check the Product
+  </button>
+
+  <!-- Product Gallery -->
+  <section class="gallery">
+    <a href="https://www.sony.co.in/home-theatre-sound-bars/products/bravia-theatre-system-6" target="_blank">
+  <img src="sony1.png" 
+       alt="Sony S60 Home Theater" 
+       style="width:300px; border-radius:12px; margin:20px 0;">
+    <a href="https://www.sony.co.in/home-theatre-sound-bars/products/bravia-theatre-system-6" target="_blank">
+  <img src="sony2.png" 
+       alt="Sony S60 Home Theater" 
+       style="width:300px; border-radius:12px; margin:20px 0;">
+    <a href="https://www.sony.co.in/home-theatre-sound-bars/products/bravia-theatre-system-6" target="_blank">
+  <img src="sony3.png" 
+       alt="Sony S60 Home Theater" 
+       style="width:300px; border-radius:12px; margin:20px 0;">
+<a href="https://www.sony.co.in/home-theatre-sound-bars/products/bravia-theatre-system-6" target="_blank">
+  <img src="sony..png" 
+       alt="Sony S60 Home Theater" 
+       style="width:300px; border-radius:12px; margin:20px 0;">
+</a>
+ 
+  </section>
+</div>
+
+<footer>
+  Enjoy The Sound In Your Home Like Theater.
+</footer>
+
+<script>
+// Show content after curtain animation
+window.addEventListener('load', () => {
+  setTimeout(() => { document.getElementById('mainContent').classList.add('show'); }, 2000);
+});
+
+// Show button and popcorn when video plays
+const video = document.getElementById('demoVideo');
+video.addEventListener('play', () => {
+  document.getElementById('productBtn').style.display = 'inline-block';
+  createPopcorn();
+});
+
+function createPopcorn() {
+  for (let i = 0; i < 5; i++) {
+    let pop = document.createElement('img');
+    pop.src = 'https://i.ibb.co/4RCh3bV/popcorn.png';
+    pop.className = 'popcorn';
+    pop.style.left = (10 + i * 15) + '%';
+    pop.style.animationDelay = (i * 1.5) + 's';
+    document.body.appendChild(pop);
+  }
+}
+</script>
+
+</body>
+</html>
